@@ -1,0 +1,50 @@
+name: "Build WASM Runtime"
+description: "Build WASM Runtime with SRTOOL"
+author: chevdor
+branding:
+  icon: "box"
+  color: "blue"
+inputs:
+  # tag:
+  #   description: 'Tag of the srtool image to use'
+  #   default: 'nightly-2021-03-15'
+  #   required: true
+  chain:
+    description: "Name of the chain, ie. polkadot"
+    required: true
+  package:
+    description: "Runtime package to build, ie. polkadot-runtime"
+    default: "runtime-${{ inputs.chain }}"
+    required: true
+  build_dir:
+    description: "Location of the runtime in your repo"
+    default: "runtime/${{ inputs.chain }}"
+    required: true
+outputs:
+  runtime:
+    description: "The generated Runtime"
+    value: 'the runtime'
+  proposal_hash:
+    description: "The proposal hash as it will show on-chain"
+    value: ${{ steps.build.outputs.proposal_hash }}
+
+  # json:
+  #   description: 'json output'
+  # ipfs_hash:
+  #   description: 'ipfs hash'
+  # blacke2_256:
+  #   description: 'blacke2_256'
+
+runs:
+  using: "composite"
+  steps:
+    - id: build
+      run: docker run --rm -it -v ${{ github.action_path }}:/build chevdor/srtool info
+      shell: bash
+    - id: parse_output
+      run: echo "::set-output name=proposal_hash::0xsdfasdfasdf"
+      shell: bash
+ 
+  # image: "chevdor/srtool:${{ inputs.tag }}"
+  # args:
+  #   - ${{ inputs.path_to_add }}
