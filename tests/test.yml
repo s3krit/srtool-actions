@@ -15,12 +15,19 @@ jobs:
       matrix:
         chain: ["westend"]
     steps:
+      - name: Check tokens
+        env:
+          TEST_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TEST_PUBLIC_CLONE_PAT: ${{ secrets.PUBLIC_CLONE_PAT }}
+        run: |
+          echo ${#TEST_GITHUB_TOKEN}
+          echo ${#TEST_PUBLIC_CLONE_PAT}
       - name: Fetch Polkadot
         uses: actions/checkout@v2
         with:
           repository: paritytech/polkadot
           path: 'polkadot'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PUBLIC_CLONE_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Srtool build
         id: srtool_build
