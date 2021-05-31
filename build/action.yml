@@ -2,13 +2,22 @@ name: "Build WASM Runtime"
 description: "Build WASM Runtime with SRTOOL"
 author: chevdor
 branding:
-  icon: "box"
+  icon: "package"
   color: "blue"
+
 inputs:
-  # tag:
-  #   description: 'Tag of the srtool image to use'
-  #   default: 'nightly-2021-03-15'
-  #   required: true
+  tag:
+    description: "Tag of the srtool image to use"
+    default: "nightly-2021-03-15"
+    required: true
+  image:
+    description: You can use an alternate image, use with caution!
+    required: true
+    default: chevdor/srtool
+  path:
+    description: Path of the project, this is where your main Cargo.toml is located
+    required: true
+    default: ${{ github.action_path }}
   chain:
     description: "Name of the chain, ie. polkadot"
     required: true
@@ -21,12 +30,21 @@ inputs:
     default: "runtime/${{ inputs.chain }}"
     required: true
 outputs:
-  runtime:
-    description: "The generated Runtime"
-    value: 'the runtime'
-  proposal_hash:
-    description: "The proposal hash as it will show on-chain"
-    value: ${{ steps.build.outputs.proposal_hash }}
+  # runtime:
+  #   description: "The generated Runtime"
+  #   value: "the runtime"
+  # proposal_hash:
+  #   description: "The proposal hash as it will show on-chain"
+  #   value: ${{ steps.build.outputs.proposal_hash }}
+  json:
+    description: The json output of srtool
+    value: ${{ steps.build.outputs.build }}
+  version:
+    description: The version of srtool
+    value: ${{ steps.build.outputs.version }}
+  info:
+    description: Some information from srtool about the current project
+    value: ${{ steps.build.outputs.info }}
 
   # json:
   #   description: 'json output'
@@ -38,13 +56,45 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - id: debug
+      shell: bash
+      run: |
+        echo Running from: ${{ inputs.path }}
+        echo Tag: ${{ inputs.tag }}
+
+    - id: version
+      shell: bash
+      run: |
+        echo Srtool version:
+        CMD="docker run --rm -it -v ${{ inputs.path }}:/build ${{ inputs.image }}:${{ inputs.tag }} /srtool/version -cM"
+        echo Running: $CMD
+        JSON=`$CMD`
+        echo "::set-output name=version::$JSON"
+
+    - id: info
+      shell: bash
+      run: |
+        echo Srtool infos:
+        CMD="docker run --rm -it -v ${{ inputs.path }}:/build ${{ inputs.image }}:${{ inputs.tag }} info -cM"
+        JSON=`$CMD`
+        echo "::set-output name=info::$JSON"
+
     - id: build
-      run: docker run --rm -it -v ${{ github.action_path }}:/build chevdor/srtool info
       shell: bash
-    - id: parse_output
-      run: echo "::set-output name=proposal_hash::0xsdfasdfasdf"
-      shell: bash
- 
-  # image: "chevdor/srtool:${{ inputs.tag }}"
-  # args:
-  #   - ${{ inputs.path_to_add }}
+      run: |
+        echo Starting build...
+        # CMD="docker run --rm -it -v ${{ inputs.path }}:/build ${{ inputs.image }}:${{ inputs.tag }} build --app --json -cM"
+        CMD="docker run --rm -it busybox echo -e I am some output\nAnd some more\n{ \"a\": 42 }"
+        # here we keep streaming the progress and fetch the last line for the json result
+        stdbuf -oL $CMD | {
+          while IFS= read -r line
+          do
+            echo "> $line"
+            JSON="$line"
+          done
+          echo "::set-output name=json::$JSON"
+        }
+
+    # - id: parse_output
+    #   run: echo "::set-output name=proposal_hash::0xsdfasdfasdf"
+    #   shell: bash
