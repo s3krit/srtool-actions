@@ -21,4 +21,4 @@ jobs:
         run: |
           which act
           act --version
-          act -W tests/dev.yml
+          act -W tests/test.yml
