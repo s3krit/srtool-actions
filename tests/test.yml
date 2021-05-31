@@ -20,7 +20,7 @@ jobs:
         with:
           repository: paritytech/polkadot
           path: 'polkadot'
-          token: ${{ github.token }}
+          token: ${{ github.PUBLIC_CLONE_PAT }}
           # ref: refs/heads/release
       - name: Srtool build
         id: srtool_build
