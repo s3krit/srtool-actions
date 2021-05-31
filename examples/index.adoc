@@ -1,0 +1,19 @@
+
+IMPORTANT: Make sure you store the yml files shown below in your repository under `.github/workflows`.
+
+== basic
+
+.basic.yml
+----
+include::01_basic.yml[]
+----
+
+== Artifacts
+----
+include::02_artifacts.yml[]
+----
+
+== IPFS
+----
+include::03_ipfs.yml[]
+----

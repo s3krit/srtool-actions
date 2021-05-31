@@ -1,0 +1,17 @@
+name: Basic Runtime Builder with SRTOOL
+
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Srtool build
+        id: srtool_build
+        uses: chevdor/srtool-action@v0.1.0
+        with:
+          chain: "westend"
+      - name: Summary
+        run: |
+          echo Here is the srtool output:
+          echo - json: ${{ steps.srtool_build.outputs.json }}
+          echo - prop: ${{ steps.srtool_build.outputs.proposal_hash }}
