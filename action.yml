@@ -17,7 +17,7 @@ inputs:
   path:
     description: "Path of the project, this is where your main Cargo.toml is located"
     required: true
-    default: "${{ github.action_path }}"
+    default: "${{ github.workspace }}"
   chain:
     description: "Name of the chain, ie. polkadot"
     required: true
@@ -58,7 +58,8 @@ runs:
     - id: debug
       shell: bash
       run: |
-        echo Running from: ${{ inputs.path }}
+        echo ENV: $GITHUB_WORKSPACE
+        echo Running from: ${{ github.workspace }}
         echo - image: ${{ inputs.image }}:${{ inputs.tag }}
         echo - package: ${{ inputs.package }}
 
@@ -66,7 +67,7 @@ runs:
       shell: bash
       run: |
         echo Srtool version:
-        CMD="docker run -i -v ${{ inputs.path }}:/build ${{ inputs.image }}:${{ inputs.tag }} /srtool/version -cM"
+        CMD="docker run -i -v ${{ github.workspace }}:/build ${{ inputs.image }}:${{ inputs.tag }} /srtool/version -cM"
         JSON=`$CMD`
         echo "::set-output name=version::$JSON"
 
@@ -74,7 +75,7 @@ runs:
       shell: bash
       run: |
         echo Srtool infos:
-        CMD="docker run -i -v ${{ inputs.path }}:/build ${{ inputs.image }}:${{ inputs.tag }} info -cM"
+        CMD="docker run -i -v ${{ github.workspace }}:/build ${{ inputs.image }}:${{ inputs.tag }} info -cM"
         JSON=`$CMD`
         echo "::set-output name=info::$JSON"
 
@@ -83,7 +84,7 @@ runs:
       shell: bash
       run: |
         echo Starting build...
-        # CMD="docker run -i -v ${{ inputs.path }}:/build ${{ inputs.image }}:${{ inputs.tag }} build --app --json -cM"
+        # CMD="docker run -i -v ${{ github.workspace }}:/build ${{ inputs.image }}:${{ inputs.tag }} build --app --json -cM"
         CMD="docker run -i busybox echo -e I am some output\nAnd some more\n{ \"a\": 42, \"prop\": \"0x12345\" }"
         # here we keep streaming the progress and fetch the last line for the json result
         stdbuf -oL $CMD | {

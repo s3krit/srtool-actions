@@ -15,6 +15,13 @@ jobs:
       matrix:
         chain: ["westend"]
     steps:
+      - name: Fetch Polkadot
+        uses: actions/checkout@v2
+        with:
+          repository: paritytech/polkadot
+          path: 'polkadot'
+          token: ${{ github.token }}
+          # ref: refs/heads/release
       - name: Srtool build
         id: srtool_build
         uses: ./
@@ -25,7 +32,7 @@ jobs:
           package: "runtime-${{ matrix.chain }}"
           image: chevdor/srtool
           tag: "nightly-2021-02-25-dev"
-          
+          path: 'polakdot'  # should be the same than the one above
       - name: Summary
         run: |
           echo Summary:
