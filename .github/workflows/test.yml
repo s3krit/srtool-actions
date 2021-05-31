@@ -8,21 +8,11 @@ jobs:
       matrix:
         images: ["nightly-2021-02-25-dev"]
     steps:
-      - name: Setup go
-        uses: actions/setup-go@v2
-        with:
-          go-version: "^1.16"
       - name: Install act
-        shell: bash
-        run: go install github.com/nektos/act@latest
-      # - uses: actions/checkout@v2
-      #   if: github.actor != 'nektos/act'
+        run: curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
+      - uses: actions/checkout@v2
       - name: Check version
-        shell: bash
         run: |
-          # which act
-          # echo $PATH
-          ls -al
-          pwd
+          which act
+          act --version
           act -W tests/dev.yml
-
