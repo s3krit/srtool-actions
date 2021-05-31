@@ -9,7 +9,7 @@ jobs:
         images: ["nightly-2021-02-25-dev"]
     steps:
       - name: Install act
-        run: curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
+        run: curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
       - uses: actions/checkout@v2
       - name: Check version
         run: |
