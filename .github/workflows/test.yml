@@ -20,7 +20,7 @@ jobs:
         id: srtool_build
         uses: ./
         with:
-          chain: ${{ matrix.chain }}
+          chain: "{{ matrix.chain }}"
           package: "runtime-${{ matrix.chain }}"
           tag: "nightly-2021-02-25-dev"
           path: 'polkadot'  # should be the same as the one above

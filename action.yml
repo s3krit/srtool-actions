@@ -4,7 +4,6 @@ author: chevdor
 branding:
   icon: "package"
   color: "blue"
-
 inputs:
   tag:
     description: "Tag of the srtool image to use"
@@ -20,14 +19,15 @@ inputs:
     default: "${{ github.workspace }}"
   chain:
     description: "Name of the chain, ie. polkadot"
+    default: "polkadot"
     required: true
   package:
     description: "Runtime package to build, ie. polkadot-runtime"
-    default: "runtime-${{ inputs.chain }}"
+    default: "runtime-polkadot"
     required: true
   build_dir:
     description: "Location of the runtime in your repo"
-    default: "runtime/${{ inputs.chain }}"
+    default: "runtime/polkadot"
     required: true
 outputs:
   # runtime:
