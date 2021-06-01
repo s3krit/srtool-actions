@@ -1,24 +1,47 @@
-name: Tests
-on: push
+name: Test CI
+
+on:
+  push
 
 jobs:
-  tests:
+  srtool:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        images: ["nightly-2021-02-25-dev"]
+        chain: ["westend"]
     steps:
-      - name: Install act
-        run: |
-          curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
-          echo "-P ubuntu-latest=catthehacker/ubuntu:act-latest" >> ~/.actrc
-          echo "-P ubuntu-20.04=catthehacker/ubuntu:act-20.04" >> ~/.actrc
-          echo "-P ubuntu-18.04=catthehacker/ubuntu:act-18.04" >> ~/.actrc
-          echo "ubuntu-16.04=catthehacker/ubuntu:act-16.04" >> ~/.actrc
-
       - uses: actions/checkout@v2
-      - name: Check version
+      - name: Fetch Polkadot
+        uses: actions/checkout@v2
+        with:
+          repository: paritytech/polkadot
+          path: 'polkadot'
+      - name: Srtool build
+        id: srtool_build
+        uses: ./
+        with:
+          chain: ${{ matrix.chain }}
+          package: "runtime-${{ matrix.chain }}"
+          tag: "nightly-2021-02-25-dev"
+          path: 'polkadot'  # should be the same as the one above
+      - name: Summary
         run: |
-          which act
-          act --version
-          act -W tests/test.yml
+          echo Summary:
+          echo - version: ${{ steps.srtool_build.outputs.version }}
+          echo - info: ${{ steps.srtool_build.outputs.info }}
+          echo - json: ${{ steps.srtool_build.outputs.json }}
+          echo - prop: ${{ steps.srtool_build.outputs.proposal_hash }}
+  artifacts:
+    needs: srtool
+    runs-on: ubuntu-latest
+    steps:
+      - name: Store artifacts
+        run: |
+          echo TODO
+  ipfs:
+    needs: srtool
+    runs-on: ubuntu-latest
+    steps:
+      - name: Seed WASM on IPFS
+        run: |
+          echo TODO
